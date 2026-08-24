@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Circuit Files — Learner Investigation</title>
+<style>
+:root{--ink:#17191b;--paper:#f4f1e8;--card:#fff;--line:#c9c3b7;--muted:#666}
+*{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+.wrap{max-width:980px;margin:auto;padding:22px}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#666}
+h1,h2{font-family:Georgia,serif}h1{font-size:clamp(42px,9vw,76px);line-height:.9;margin:10px 0 16px}h2{font-size:clamp(28px,5vw,42px);margin:10px 0}
+p{line-height:1.55}.lead{font-family:Georgia,serif;font-size:19px;max-width:760px}.warning{border:2px solid var(--ink);border-radius:12px;padding:14px;font-weight:800}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}.case{border-top:3px solid var(--ink);margin-top:34px;padding-top:24px}
+.stamp{display:inline-block;border:2px solid var(--ink);padding:6px 10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;transform:rotate(-1deg)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.role{border:1px dashed var(--ink);border-radius:12px;padding:12px}
+label{display:block;font-weight:800;margin:14px 0 7px}input,textarea{width:100%;font:inherit;font-size:16px;color:inherit;background:#fff;border:1px solid #aaa;border-radius:10px;padding:12px}textarea{min-height:92px;resize:vertical}
+button,a.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 17px;border-radius:999px;border:1px solid var(--ink);background:transparent;color:var(--ink);font:inherit;font-weight:850;text-decoration:none;cursor:pointer;margin:5px 5px 5px 0}.primary{background:var(--ink)!important;color:#fff!important}
+.progress{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0}.dot{border:1px solid var(--ink);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900}.done{background:var(--ink);color:#fff}.hidden{display:none}.status{font-weight:850;margin-top:8px}.small{font-size:14px;color:var(--muted)}
+.diagram{background:#fbfaf6;border:1px solid var(--line);border-radius:12px;padding:10px}.diagram svg{width:100%;height:auto;display:block}.wire,.symbol{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.junction{fill:var(--ink)}.caption{text-align:center;font-weight:900;margin:6px}
+.clue{border-left:4px solid var(--ink);padding-left:14px;font-family:Georgia,serif;font-style:italic}.reveal{background:#efebe2;border-radius:12px;padding:14px;margin-top:12px}
+@media(max-width:650px){.wrap{padding:16px}.grid,.roles{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main id="app" class="wrap">
+<div class="eyebrow">Confidential Investigation • One iPad per team</div>
+<h1>THE CIRCUIT FILES</h1>
+<p class="lead">An electrical system has been altered. The components are familiar. Its behaviour is not. Your team must discover what changed — without being given the rules.</p>
+<div class="warning">RULE OF EVIDENCE: “We think…” is not enough. Every claim must be supported by a test your team can reproduce.</div>
+
+<div class="progress">
+<span class="dot done" id="p1">CASE 01</span><span class="dot" id="p2">02</span><span class="dot" id="p3">03</span><span class="dot" id="p4">04</span><span class="dot" id="p5">05</span><span class="dot" id="p6">FINAL</span>
+</div>
+
+<div class="panel">
+<h3>Assemble your investigation team</h3>
+<div class="grid"><div><label>Team name</label><input placeholder="Choose a team name"></div><div><label>Three investigators</label><input placeholder="Names"></div></div>
+<div class="roles">
+<div class="role"><b>BUILDER</b><br><span class="small">Controls PhET. Builds only what the team agrees to test.</span></div>
+<div class="role"><b>THEORIST</b><br><span class="small">Makes predictions and challenges weak explanations.</span></div>
+<div class="role"><b>EVIDENCE KEEPER</b><br><span class="small">Records observations and measurements.</span></div>
+</div>
+<p class="small">Rotate roles after every unlocked case.</p>
+<a class="btn primary" href="https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_en.html?screens=2" target="_blank" rel="noopener">OPEN PhET LAB ↗</a>
+</div>
+
+<section class="case" id="case1">
+<div class="stamp">Case 01 • The Alteration</div><h2>Same components. Different wiring.</h2>
+<p class="lead">Two unlabelled circuit diagrams were recovered. Study them before opening the simulation.</p>
+<div class="grid">
+<div class="diagram">
+<svg viewBox="0 0 400 230" aria-label="Circuit X">
+<!-- one-loop circuit: two lamps in series and a cell -->
+<path class="wire" d="M50 55 H135 M195 55 H255 M315 55 H345 V180 H225 M160 180 H50 V55"/>
+<circle class="symbol" cx="165" cy="55" r="30"/><path class="symbol" d="M144 34 L186 76 M186 34 L144 76"/>
+<circle class="symbol" cx="285" cy="55" r="30"/><path class="symbol" d="M264 34 L306 76 M306 34 L264 76"/>
+<!-- cell symbol -->
+<path class="symbol" d="M180 153 V207 M205 163 V197"/><path class="wire" d="M160 180 H180 M205 180 H225"/>
+</svg><div class="caption">CIRCUIT X</div></div>
+<div class="diagram">
+<svg viewBox="0 0 400 230" aria-label="Circuit Y">
+<!-- parallel circuit: two lamp branches and a cell -->
+<path class="wire" d="M50 55 H105 M105 55 H345 V180 H225 M160 180 H50 V55"/>
+<path class="wire" d="M105 55 V95 H135 M195 95 H270 V55"/>
+<path class="wire" d="M105 55 V150 H135 M195 150 H270 V55"/>
+<circle class="symbol" cx="165" cy="95" r="30"/><path class="symbol" d="M144 74 L186 116 M186 74 L144 116"/>
+<circle class="symbol" cx="165" cy="150" r="30"/><path class="symbol" d="M144 129 L186 171 M186 129 L144 171"/>
+<circle class="junction" cx="105" cy="55" r="5"/><circle class="junction" cx="270" cy="55" r="5"/>
+<path class="symbol" d="M180 153 V207 M205 163 V197"/><path class="wire" d="M160 180 H180 M205 180 H225"/>
+</svg><div class="caption">CIRCUIT Y</div></div>
+</div>
+
+<div class="panel"><h3>STOP — no PhET yet.</h3>
+<label>What structural differences can you see?</label><textarea></textarea>
+<label>Make one risky prediction about how the circuits might behave differently. Explain why.</label><textarea></textarea></div>
+
+<div class="panel"><h3>Now investigate.</h3>
+<p>Recreate both circuits. Your team may change, remove, add, disconnect, observe or measure anything that could expose a meaningful difference.</p>
+<p><b>Restriction:</b> keep the same supply while comparing them.</p>
+<label>What did you deliberately change?</label><textarea></textarea>
+<label>What happened in Circuit X?</label><textarea></textarea>
+<label>What happened in Circuit Y?</label><textarea></textarea>
+<label>What does your evidence suggest? Do not merely repeat what you saw.</label><textarea></textarea></div>
+
+<div class="panel"><h3>🔒 Game Master checkpoint</h3><p>Every investigator must be able to explain the test and defend the claim.</p>
+<input id="c1" placeholder="Game Master code" inputmode="numeric"><button class="primary unlock" data-n="1">VERIFY EVIDENCE</button><div class="status" id="s1"></div></div>
+</section>
+
+<section class="case hidden" id="case2">
+<div class="stamp">Case 02 • Sabotage</div><h2>Can your circuit survive?</h2>
+<p class="clue">A circuit that works perfectly tells you less than a circuit you deliberately break.</p>
+<div class="panel">
+<p>You have <b>one supply and three identical lamps</b>. A saboteur will remove exactly ONE lamp after your circuit is complete.</p>
+<p>Create the arrangement that suffers the <b>least possible disruption</b>. Test at least <b>three genuinely different arrangements</b>.</p>
+<label>Attempt 1 — design and result after removing one lamp</label><textarea></textarea>
+<label>Attempt 2</label><textarea></textarea><label>Attempt 3</label><textarea></textarea>
+<label>Which design survived best?</label><textarea></textarea>
+<label>WHY? Identify a feature of the wiring — not just what the lamps did.</label><textarea></textarea>
+</div>
+<div class="panel"><h3>🔒 Game Master checkpoint</h3><p>“The other lamps stayed on” is only an observation. Explain what about the wiring made that possible.</p>
+<input id="c2" placeholder="Game Master code" inputmode="numeric"><button class="primary unlock" data-n="2">VERIFY EVIDENCE</button><div class="status" id="s2"></div></div>
+</section>
+
+<section class="case hidden" id="case3">
+<div class="stamp">Case 03 • Pattern Hunt</div><h2>Find something nobody told you to measure.</h2>
+<div class="panel">
+<p>Choose one arrangement. Create versions with <b>1, 2 and 3 identical lamps</b>.</p><p>Your team decides what is worth observing or measuring. Find a pattern strong enough to make a prediction.</p>
+<label>What quantity or behaviour did you investigate?</label><textarea></textarea>
+<label>What pattern did you find?</label><textarea></textarea>
+<label>Predict what should happen with FOUR lamps. Explain your reasoning.</label><textarea></textarea>
+<button id="commit3" type="button">COMMIT TO PREDICTION</button>
+<div id="twist3" class="hidden reveal"><b>NEW EVIDENCE REQUIRED</b><p>Do not test four lamps yet. Rearrange the wiring into the OTHER circuit type from Case 01.</p>
+<label>Does your rule survive? What changed?</label><textarea></textarea>
+<label>Rewrite your rule so it accounts for both arrangements.</label><textarea></textarea></div>
+</div>
+<div class="panel"><h3>🔒 Game Master checkpoint</h3><p>Present a pattern, a prediction and a test that could have proved your original idea wrong.</p>
+<input id="c3" placeholder="Game Master code" inputmode="numeric"><button class="primary unlock" data-n="3">VERIFY EVIDENCE</button><div class="status" id="s3"></div></div>
+</section>
+
+<section class="case hidden" id="case4">
+<div class="stamp">Case 04 • Current Crime Scene</div><h2>Three readings. No labels.</h2>
+<div class="panel">
+<p>A technician took three current readings from one circuit containing two identical lamps:</p>
+<p style="font-size:30px;font-weight:900;text-align:center">0.90 A &nbsp; • &nbsp; 0.45 A &nbsp; • &nbsp; 0.45 A</p>
+<p>The measuring-position labels were destroyed. Construct a circuit in which all three readings can be true. You decide where to measure.</p>
+<label>Where does each reading belong?</label><textarea></textarea>
+<label>What mathematical relationship exists between the readings?</label><textarea></textarea>
+<label>What does this suggest is happening to current at a junction?</label><textarea></textarea>
+<label>Move the ammeter. Does your explanation still work?</label><textarea></textarea>
+</div>
+<div class="panel"><h3>🔒 Game Master checkpoint</h3><p>The Game Master may choose a new measuring position. Your explanation must predict what happens there.</p>
+<input id="c4" placeholder="Game Master code" inputmode="numeric"><button class="primary unlock" data-n="4">VERIFY EVIDENCE</button><div class="status" id="s4"></div></div>
+</section>
+
+<section class="case hidden" id="case5">
+<div class="stamp">Case 05 • The 9 V Dispute</div><h2>Two scientists. Two confident claims.</h2>
+<div class="panel">
+<p>The supply is set to <b>9 V</b>.</p>
+<p><b>Scientist A:</b> “Every lamp always has 9 V across it because the supply is 9 V.”</p>
+<p><b>Scientist B:</b> “The 9 V is always divided between the lamps.”</p>
+<div class="warning">Your case file says neither statement works for every circuit.</div>
+<p>Build whatever circuits you need. Use a voltmeter to determine when each claim appears true and when it fails.</p>
+<label>Measurements that challenge Scientist A</label><textarea></textarea>
+<label>Measurements that challenge Scientist B</label><textarea></textarea>
+<label>What feature of the arrangement determines what happens to potential difference?</label><textarea></textarea>
+<label>Create a better rule that explains both arrangements.</label><textarea></textarea>
+</div>
+<div class="panel"><h3>🔒 Game Master checkpoint</h3><p>Your evidence must contain actual voltage measurements.</p>
+<input id="c5" placeholder="Game Master code" inputmode="numeric"><button class="primary unlock" data-n="5">OPEN THE BLACK BOX</button><div class="status" id="s5"></div></div>
+</section>
+
+<section class="case hidden" id="case6">
+<div class="stamp">Final Case • The Black Box</div><h2>The wiring is hidden.</h2>
+<p class="lead">You cannot see the circuit. You only know how it behaves. Reconstruct it.</p>
+<div class="panel">
+<h3>Recovered evidence</h3>
+<p>① Three identical lamps use one supply.</p>
+<p>② Removing Lamp 1 does not stop Lamps 2 or 3.</p>
+<p>③ Current leaving the supply is greater than the current through one lamp.</p>
+<p>④ The potential difference across each lamp equals the supply potential difference.</p>
+<p>⑤ There are places where current separates and later comes together again.</p>
+</div>
+<div class="panel">
+<h3>Reconstruct the invisible circuit</h3>
+<p>Build your proposed circuit in PhET. Then deliberately try to prove your own model wrong.</p>
+<label>Describe or sketch the hidden wiring.</label><textarea></textarea>
+<label>Evidence that explains clue ②</label><textarea></textarea>
+<label>Evidence that explains clue ③</label><textarea></textarea>
+<label>Evidence that explains clue ④</label><textarea></textarea>
+<label>What ONE structural feature explains all five clues?</label><textarea></textarea>
+<button id="nameReveal" type="button" class="primary">SUBMIT RECONSTRUCTION</button>
+<div id="names" class="hidden reveal"><h3>🔓 Scientific terminology unlocked</h3>
+<p>The two arrangements you have investigated are called <b>SERIES CIRCUITS</b> and <b>PARALLEL CIRCUITS</b>.</p>
+<p>Do not copy definitions. Construct the rules from your evidence.</p>
+<label>Series — describe the pathway and current behaviour.</label><textarea></textarea>
+<label>Parallel — describe the pathways and current behaviour.</label><textarea></textarea>
+<label>Compare potential difference in the two arrangements.</label><textarea></textarea>
+</div></div>
+
+<div class="panel"><h3>🏠 BOSS LEVEL — The House</h3>
+<p>A newly wired house has a serious problem. When the kitchen lamp fails, the bedroom lights, television and refrigerator also stop working.</p>
+<p>Diagnose the wiring, redesign it in PhET, deliberately cause one component to fail, and demonstrate that your solution works.</p>
+<label>Diagnosis</label><textarea></textarea>
+<label>Describe your redesign</label><textarea></textarea>
+<label>Experimental proof</label><textarea></textarea>
+<label>FINAL CHALLENGE: Without using the words “series” or “parallel”, explain why your design is better for a house. Use pathways, current and potential difference.</label><textarea></textarea>
+</div>
+<div class="warning">CASE CLOSED only when every team member can defend the final design using experimental evidence.</div>
+</section>
+</main>
+
+<script>
+(()=>{const root=document.getElementById('app');
+const codes={1:'7314',2:'2685',3:'9142',4:'3576',5:'4821'};
+document.querySelectorAll('.unlock').forEach(btn=>btn.addEventListener('click',()=>{
+ const n=Number(btn.dataset.n), input=document.getElementById('c'+n), status=document.getElementById('s'+n);
+ if(input.value.trim()!==codes[n]){status.textContent='ACCESS DENIED — call the Game Master and strengthen your evidence.';return;}
+ status.textContent='EVIDENCE ACCEPTED — rotate roles before continuing.';
+ const next=document.getElementById('case'+(n+1)); next.classList.remove('hidden'); document.getElementById('p'+(n+1)).classList.add('done');
+ setTimeout(()=>next.scrollIntoView({behavior:'smooth',block:'start'}),200);
+}));
+document.getElementById('commit3').addEventListener('click',e=>{document.getElementById('twist3').classList.remove('hidden');e.currentTarget.disabled=true;e.currentTarget.textContent='PREDICTION COMMITTED';});
+document.getElementById('nameReveal').addEventListener('click',e=>{document.getElementById('names').classList.remove('hidden');e.currentTarget.disabled=true;e.currentTarget.textContent='TERMINOLOGY UNLOCKED';});
+})();
+</script>
+</body>
+</html>
