@@ -1,1 +1,684 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rock Cycle Rescue | Verve College</title>
+<style>
+:root {
+  --bg:#102f36;
+  --panel:#1b434b;
+  --gold:#ffd27b;
+  --mint:#a5ebcf;
+  --text:#f1f8f5;
+}
+* { box-sizing:border-box }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:17px/1.6 system-ui,sans-serif;
+}
+header {
+  padding:20px 5%;
+  border-bottom:1px solid #547078;
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:center;
+}
+.brand { color:var(--mint); font-size:12px; letter-spacing:2px }
+main { max-width:980px; margin:auto; padding:25px 22px 70px }
+h1 { font-size:clamp(42px,8vw,76px); line-height:1.08; margin:25px 0 }
+h2 { font-size:30px; line-height:1.2 }
+h3 { line-height:1.3 }
+button,textarea,select,input { font:inherit }
+button {
+  cursor:pointer;
+  color:var(--text);
+  background:#28545c;
+  border:1px solid #77969b;
+  border-radius:13px;
+  padding:12px 18px;
+  min-height:48px;
+}
+button:hover { border-color:var(--gold) }
+button:focus-visible,textarea:focus-visible,select:focus-visible {
+  outline:3px solid var(--gold);
+  outline-offset:3px;
+}
+button:disabled { opacity:.45; cursor:default }
+.primary { background:var(--gold); color:#16343b; font-weight:bold; border:0 }
+.card {
+  padding:24px;
+  background:var(--panel);
+  border:1px solid #4c6b72;
+  border-radius:22px;
+  margin:18px 0;
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
+}
+.grid .card { margin:0 }
+.row { display:flex; gap:12px; flex-wrap:wrap; align-items:center }
+.eyebrow { color:var(--gold); font-size:13px; letter-spacing:2px; text-transform:uppercase }
+small,.muted { color:#bdd3d5 }
+nav { display:flex; gap:8px; overflow:auto; margin:18px 0 }
+nav button { white-space:nowrap; font-size:14px }
+nav .active { background:var(--mint); color:#16343b }
+.bar { background:#39575e; height:8px; border-radius:8px; overflow:hidden }
+.bar div { background:var(--mint); height:100% }
+.option { display:block; width:100%; text-align:left; margin:10px 0 }
+textarea,select {
+  width:100%;
+  padding:12px;
+  color:white;
+  background:#103039;
+  border:1px solid #809b9f;
+  border-radius:10px;
+}
+textarea { min-height:120px; resize:vertical }
+label { display:block; margin:15px 0 7px }
+.feedback {
+  border-left:4px solid var(--gold);
+  padding:15px;
+  background:#102f36;
+  margin:15px 0;
+}
+.good { border-color:var(--mint) }
+details {
+  background:#183e46;
+  padding:16px;
+  border:1px solid #527279;
+  border-radius:14px;
+  margin:12px 0;
+}
+summary { cursor:pointer; font-weight:bold }
+.hidden { display:none }
+.rock {
+  width:180px;
+  height:145px;
+  margin:30px auto;
+  background:linear-gradient(140deg,#a5ebcf,#527774 40%,#31575e 41%,#d7ad71 65%,#6d8d86);
+  clip-path:polygon(15% 18%,65% 0,95% 35%,90% 85%,40% 100%,0 70%);
+}
+.badge { text-align:center; border:2px solid var(--gold); border-radius:24px; padding:35px }
+footer { margin-top:35px; font-size:12px; color:#bdd3d5 }
+a { color:var(--mint) }
+@media(max-width:600px) {
+  .card { padding:18px }
+  header { align-items:flex-start }
+}
+@media print {
+  header,nav,button,footer,#status,#guide { display:none!important }
+  body { background:white; color:black }
+  .card,.badge { background:white; color:black; border:1px solid #777 }
+  .muted,small { color:#444 }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">VERVE COLLEGE / GRADE 9 NS</div>
+    <strong>Rock Cycle Rescue</strong>
+  </div>
+  <button onclick="toggleGuide()">Field guide</button>
+</header>
+
+<main>
+  <div id="status"></div>
+  <nav id="nav" aria-label="Mission stages"></nav>
+  <section id="app"></section>
+  <section id="guide" class="hidden"></section>
+  <footer>
+    Content based on
+    <a href="https://www.siyavula.com/read/za/natural-sciences/grade-9/the-lithosphere/24-the-lithosphere"
+       target="_blank" rel="noopener">Siyavula Grade 9: The lithosphere</a>.
+    <p>Progress saves in this browser when storage is available.
+    Work is not sent to your facilitator automatically.</p>
+    <button onclick="restart()">Start over</button>
+  </footer>
+</main>
+
+<script>
+const KEY = "verve-rock-rescue-v2";
+const fresh = () => ({
+  stage:0,
+  done:[],
+  sphereText:"",
+  caseDone:[],
+  order:[],
+  journey:["Igneous rock"],
+  processes:[],
+  explanation:"",
+  exhibit:"",
+  reflection:"",
+  checks:[false,false,false,false]
+});
+
+let state = fresh();
+let storageOK = true;
+
+try {
+  const saved = JSON.parse(localStorage.getItem(KEY) || "null");
+  if (saved && Array.isArray(saved.done)) {
+    state = {...fresh(), ...saved};
+  }
+} catch (e) {
+  storageOK = false;
+}
+
+const $ = id => document.getElementById(id);
+const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({
+  "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+}[char]));
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch (e) { storageOK = false; }
+}
+
+function finish(stage) {
+  if (!state.done.includes(stage)) state.done.push(stage);
+  save();
+}
+
+function go(stage) {
+  if (stage > 0 && !state.done.includes(stage - 1)) return;
+  state.stage = stage;
+  save();
+  render();
+  window.scrollTo(0,0);
+}
+
+function feedback(id,text,good=false) {
+  $(id).innerHTML =
+    `<div class="feedback ${good ? "good" : ""}" role="status">${text}</div>`;
+}
+
+function nextButton(stage,text="Continue →") {
+  return `<button class="primary" onclick="go(${stage})">${text}</button>`;
+}
+
+const stageNames = [
+  "Arrival","Sphere signals","Evidence room",
+  "Cycle machine","Rock adventure","Your exhibit","Badge"
+];
+
+const notes = [
+  ["The rocky setting",
+   "The lithosphere includes Earth's crust and rigid uppermost mantle. Rocks contain minerals."],
+  ["Igneous: a molten beginning",
+   "Magma is molten rock below Earth's surface. Lava is molten rock at the surface. Cooling and solidification form igneous rock. Slow cooling underground allows larger crystals to grow, as in granite. Faster cooling at the surface usually produces smaller crystals, as in basalt."],
+  ["Sedimentary: layers tell stories",
+   "Weathering breaks rocks into smaller particles. Erosion transports these particles. Deposition happens when they settle. Burial compacts sediment, while cementation binds the grains. Sand can become sandstone. Fossils may be preserved in sedimentary layers."],
+  ["Metamorphic: change without melting",
+   "Heat and pressure change existing solid rock without melting it. Limestone can become marble. Shale can become slate. If rock melts, it becomes molten material rather than metamorphic rock."],
+  ["A cycle with choices",
+   "There is no compulsory starting point or single route. Any rock type can weather into sediment, change under suitable heat and pressure, or melt if conditions allow. Magma can cool into igneous rock again. These changes usually take very long periods."]
+];
+
+function guideHTML() {
+  return `<h2>Your geologist's field guide</h2>
+    <p>Open each card and investigate. Return here whenever you need help.</p>` +
+    notes.map(([title,text]) =>
+      `<details><summary>${title}</summary><p>${text}</p></details>`
+    ).join("");
+}
+
+function toggleGuide() {
+  const guide = $("guide");
+  guide.classList.toggle("hidden");
+  if (!guide.classList.contains("hidden")) {
+    guide.innerHTML = guideHTML();
+    guide.scrollIntoView({behavior:"smooth"});
+  }
+}
+
+function render() {
+  const n = state.stage;
+  $("guide").classList.add("hidden");
+  const completed = state.done.filter(x => x < 6).length;
+
+  $("status").innerHTML =
+    `<small>INDEPENDENT MISSION • ABOUT 60 MINUTES • ${completed}/6 stages complete</small>
+    ${storageOK ? "" : "<p>Storage unavailable: keep this tab open and download your work at the end.</p>"}
+    <div class="bar"><div style="width:${completed/6*100}%"></div></div>`;
+
+  $("nav").innerHTML = stageNames.map((name,i) =>
+    `<button class="${i===n ? "active" : ""}"
+      ${i>0 && !state.done.includes(i-1) ? "disabled" : ""}
+      onclick="go(${i})">${state.done.includes(i) ? "✓ " : ""}${name}</button>`
+  ).join("");
+
+  if (n===0) arrival();
+  if (n===1) spheres();
+  if (n===2) evidence();
+  if (n===3) machine();
+  if (n===4) adventure();
+  if (n===5) exhibit();
+  if (n===6) badge();
+}
+
+function arrival() {
+  $("app").innerHTML = `
+    <p class="eyebrow">A message from the museum</p>
+    <h1>These rocks have<br>lost their stories.</h1>
+    <p>The labels are wrong. The cycle machine is scrambled.
+    You are the geologist who can put everything back together.</p>
+    <div class="rock" aria-hidden="true"></div>
+    <button class="primary" onclick="finish(0);go(1)">Accept the mission →</button>
+    <div class="grid" style="margin-top:25px">
+      <div class="card"><h3>Investigate</h3><p>Use the field guide and follow the evidence.</p></div>
+      <div class="card"><h3>Decide</h3><p>Try ideas, read feedback and rethink your choices.</p></div>
+      <div class="card"><h3>Create</h3><p>Tell a rock's story through a diary, comic or exhibit.</p></div>
+    </div>`;
+}
+
+function spheres() {
+  const objects = ["Rocky hillside","Rainwater","Wind / air","Tree and roots"];
+  const options = ["Atmosphere","Biosphere","Hydrosphere","Lithosphere"];
+  $("app").innerHTML = `
+    <p class="eyebrow">01 / Sphere signals • 5 minutes</p>
+    <h2>The spheres are working together.</h2>
+    <p>You explored each sphere last time. Now imagine a tree growing on
+    a rocky hillside. Rain falls, wind blows and roots spread through cracks.</p>
+    <div class="card">
+    ${objects.map((name,i) => `
+      <label for="sphere${i}">${name}</label>
+      <select id="sphere${i}">
+        <option value="">Choose a sphere</option>
+        ${options.map(option=>`<option>${option}</option>`).join("")}
+      </select>`).join("")}
+    <label for="sphereText">Explain how one sphere could change or move rock.</label>
+    <textarea id="sphereText"
+      oninput="state.sphereText=this.value;save()"
+      placeholder="The ... interacts with the lithosphere when ...">${escapeHTML(state.sphereText)}</textarea>
+    <button onclick="checkSpheres()">Check signals</button>
+    <div id="sphereFeedback"></div>
+    </div>`;
+}
+
+function checkSpheres() {
+  const correct = ["Lithosphere","Hydrosphere","Atmosphere","Biosphere"];
+  if (!correct.every((value,i)=>$("sphere"+i).value===value)) {
+    feedback("sphereFeedback","Some signals are crossed. Think: rock, water, air and life.");
+    return;
+  }
+  if (state.sphereText.trim().length<25) {
+    feedback("sphereFeedback","Your matches are right. Add a full explanation of how something changes or moves rock.");
+    return;
+  }
+  finish(1);
+  feedback("sphereFeedback",
+    `Signals restored! Roots can widen cracks; rain can carry loose grains.
+    Your facilitator will review your explanation.<p>${nextButton(2)}</p>`,true);
+}
+
+const cases = [
+  {
+    question:"A rock cooled slowly underground and has large visible crystals. Which label fits?",
+    options:["Sedimentary sandstone","Igneous granite","Metamorphic marble"],
+    answer:1,
+    reason:"Slow underground cooling allows larger crystals to grow.",
+    hint:"Look for the label linked to cooling magma."
+  },
+  {
+    question:"Cemented sand grains form layers that may contain fossils. What is the rock?",
+    options:["Sedimentary sandstone","Igneous basalt","Metamorphic slate"],
+    answer:0,
+    reason:"Compaction and cementation can turn sand into sandstone.",
+    hint:"Which type forms from sediment?"
+  },
+  {
+    question:"Limestone changes under heat and pressure while remaining solid. What forms?",
+    options:["Magma","Sedimentary sandstone","Metamorphic marble"],
+    answer:2,
+    reason:"Heat and pressure change limestone into marble without melting it.",
+    hint:"The rock stays solid. Check the metamorphic field note."
+  },
+  {
+    question:"Which museum label is scientifically correct?",
+    options:[
+      "Weathering and erosion both mean melting.",
+      "Weathering transports particles; erosion breaks rock.",
+      "Weathering breaks rock; erosion transports particles."
+    ],
+    answer:2,
+    reason:"Weathering breaks material down. Erosion moves it.",
+    hint:"Breaking and carrying are different actions."
+  },
+  {
+    question:"Two rocks formed from molten material. One has much smaller crystals. What is likely?",
+    options:["It cooled faster.","It cooled more slowly.","It formed only through pressure."],
+    answer:0,
+    reason:"Faster cooling usually leaves less time for crystals to grow.",
+    hint:"Think about the time available for crystal growth."
+  }
+];
+
+function evidence() {
+  $("app").innerHTML = `
+    <p class="eyebrow">02 / Evidence room • 20 minutes</p>
+    <h2>Investigate the mystery rocks.</h2>
+    ${guideHTML()}
+    ${cases.map((item,i)=>`
+      <div class="card">
+        <p class="eyebrow">Evidence ${i+1} / ${cases.length}</p>
+        <h3>${item.question}</h3>
+        ${item.options.map((option,j)=>`
+          <button class="option" onclick="checkCase(${i},${j})">${option}</button>
+        `).join("")}
+        <div id="caseFeedback${i}">
+          ${state.caseDone.includes(i) ?
+          `<div class="feedback good">✓ ${item.reason}</div>` : ""}
+        </div>
+      </div>`).join("")}
+    <div id="evidenceEnd"></div>`;
+  evidenceEnd();
+}
+
+function evidenceEnd() {
+  if (cases.every((item,i)=>state.caseDone.includes(i))) {
+    finish(2);
+    $("evidenceEnd").innerHTML = nextButton(3,"Enter the machine room →");
+  }
+}
+
+function checkCase(i,answer) {
+  const item=cases[i];
+  if (answer!==item.answer) {
+    feedback("caseFeedback"+i,"Try again. "+item.hint);
+    return;
+  }
+  if (!state.caseDone.includes(i)) state.caseDone.push(i);
+  save();
+  feedback("caseFeedback"+i,"✓ "+item.reason,true);
+  evidenceEnd();
+}
+
+const events = [
+  "Underground magma",
+  "Solid igneous rock",
+  "Loose rock grains",
+  "Grains travelling in a river",
+  "Sediment settles",
+  "Sandstone layers form",
+  "Solid rock becomes metamorphic",
+  "Rock melts into magma"
+];
+
+const processes = [
+  "Cooling and solidification",
+  "Weathering",
+  "Erosion",
+  "Deposition",
+  "Compaction and cementation",
+  "Heat and pressure",
+  "Melting"
+];
+
+function machine() {
+  $("app").innerHTML = `
+    <p class="eyebrow">03 / Cycle machine • 10 minutes</p>
+    <h2>Repair the scrambled sequence.</h2>
+    <p>Start with underground magma. Tap the events in a sensible order.
+    This machine follows one possible journey.</p>
+    <div class="card">
+      <strong>${state.order.length ?
+        state.order.map(i=>events[i]).join(" → ") : "Your machine is empty."}</strong>
+      <div class="row" style="margin-top:15px">
+        <button onclick="state.order.pop();save();machine()">Undo last step</button>
+        <button onclick="state.order=[];save();machine()">Clear sequence</button>
+      </div>
+    </div>
+    <div class="grid">
+    ${[5,2,0,6,3,7,1,4].map(i=>`
+      <button ${state.order.includes(i) ? "disabled" : ""}
+      onclick="state.order.push(${i});save();machine()">${events[i]}</button>
+    `).join("")}
+    </div>
+    <button class="primary" style="margin-top:20px" onclick="checkMachine()">Run the machine</button>
+    <div id="machineFeedback"></div>`;
+}
+
+function checkMachine() {
+  if (state.order.length!==8) {
+    feedback("machineFeedback","Add all eight events before running the machine.");
+    return;
+  }
+  const wrong=state.order.findIndex((value,i)=>value!==i);
+  if (wrong!==-1) {
+    const hint=wrong===0 ?
+      "Begin with underground magma." :
+      `After ${events[wrong-1].toLowerCase()}, think about ${processes[wrong-1].toLowerCase()}.`;
+    feedback("machineFeedback",
+      `The machine jams at step ${wrong+1}. ${hint} Use Undo or Clear sequence.`);
+    return;
+  }
+  finish(3);
+  feedback("machineFeedback",`
+    <strong>Machine repaired!</strong>
+    ${processes.map((process,i)=>`
+      <p>${events[i]} → <strong>${process}</strong> → ${events[i+1]}</p>
+    `).join("")}
+    <p>Remember: this is one route. Rocks do not have to follow this order.</p>
+    ${nextButton(4)}`,true);
+}
+
+const transitions = {
+  "Igneous rock":[
+    ["Weathering","Sediment"],
+    ["Heat and pressure without melting","Metamorphic rock"],
+    ["Melting","Magma"]
+  ],
+  "Sediment":[
+    ["Deposition, compaction and cementation","Sedimentary rock"]
+  ],
+  "Sedimentary rock":[
+    ["Weathering","Sediment"],
+    ["Heat and pressure without melting","Metamorphic rock"],
+    ["Melting","Magma"]
+  ],
+  "Metamorphic rock":[
+    ["Weathering","Sediment"],
+    ["Melting","Magma"]
+  ],
+  "Magma":[
+    ["Cooling and solidification","Igneous rock"]
+  ]
+};
+
+function adventure() {
+  const current=state.journey[state.journey.length-1];
+  $("app").innerHTML = `
+    <p class="eyebrow">04 / Rock adventure • 10 minutes</p>
+    <h2>Your rock. Your route.</h2>
+    <p>Make at least three valid changes. You can revisit a rock type.
+    Each choice tells you the process and its result.</p>
+    <div class="card">
+      ${state.journey.map((rock,i)=>`
+        <p>${i ? `<small>↓ ${state.processes[i-1]}</small><br>` : ""}
+        <strong>${rock}</strong></p>
+      `).join("")}
+      <h3>What happens next?</h3>
+      ${transitions[current].map(([process,result],i)=>`
+        <button class="option" onclick="travel(${i})">${process} → ${result}</button>
+      `).join("")}
+      <button onclick="resetJourney()">Restart this journey</button>
+    </div>
+    ${state.processes.length>=3 ? `
+      <div class="card">
+        <h3>You have explored at least three changes.</h3>
+        <label for="explanation">Why does metamorphic rock not need to melt?</label>
+        <textarea id="explanation"
+          oninput="state.explanation=this.value;save()">${escapeHTML(state.explanation)}</textarea>
+        <button class="primary" onclick="finishAdventure()">Save journey →</button>
+        <div id="adventureFeedback"></div>
+      </div>` : ""}`;
+}
+
+function travel(i) {
+  const current=state.journey[state.journey.length-1];
+  const [process,result]=transitions[current][i];
+  state.processes.push(process);
+  state.journey.push(result);
+  save();
+  adventure();
+}
+
+function resetJourney() {
+  state.journey=["Igneous rock"];
+  state.processes=[];
+  save();
+  adventure();
+}
+
+function finishAdventure() {
+  if (state.explanation.trim().length<25) {
+    feedback("adventureFeedback","Add a full sentence explaining what heat and pressure do to solid rock.");
+    return;
+  }
+  finish(4);
+  go(5);
+}
+
+const checklist = [
+  "I included all three rock types and magma.",
+  "I explained every transformation using the correct process.",
+  "I showed air or wind, water and living things interacting with rock.",
+  "I explained that there are different possible routes."
+];
+
+function exhibit() {
+  $("app").innerHTML = `
+    <p class="eyebrow">05 / Your final exhibit • 15 minutes</p>
+    <h2>Give your rock a voice.</h2>
+    <p>Choose one format: a six-entry rock diary, a six-panel comic script,
+    or six museum display cards.</p>
+    <p>You can write here, or create your work in another iPad app
+    and describe your exhibit here.</p>
+    <div class="card">
+      <label for="exhibitText">Your exhibit, script or description</label>
+      <textarea id="exhibitText" style="min-height:230px"
+        oninput="state.exhibit=this.value;save()">${escapeHTML(state.exhibit)}</textarea>
+      <h3>Check your science</h3>
+      ${checklist.map((text,i)=>`
+        <label>
+          <input type="checkbox" ${state.checks[i] ? "checked" : ""}
+            onchange="state.checks[${i}]=this.checked;save()">
+          ${text}
+        </label>
+      `).join("")}
+      <label for="reflection">What idea did you rethink? Explain your new understanding.</label>
+      <textarea id="reflection"
+        oninput="state.reflection=this.value;save()">${escapeHTML(state.reflection)}</textarea>
+      <button class="primary" onclick="finishExhibit()">Complete my mission →</button>
+      <div id="exhibitFeedback"></div>
+    </div>`;
+}
+
+function finishExhibit() {
+  if (state.exhibit.trim().length<120) {
+    feedback("exhibitFeedback","Add your exhibit or description: at least 120 characters.");
+    return;
+  }
+  if (!state.checks.every(Boolean)) {
+    feedback("exhibitFeedback","Check your work against all four science criteria, then tick each one.");
+    return;
+  }
+  if (state.reflection.trim().length<25) {
+    feedback("exhibitFeedback","Write a full sentence explaining your new understanding.");
+    return;
+  }
+  finish(5);
+  go(6);
+}
+
+function badge() {
+  $("app").innerHTML = `
+    <div class="badge">
+      <div style="font-size:65px;color:var(--gold)">✦</div>
+      <p class="eyebrow">Mission complete</p>
+      <h1 style="font-size:44px">Junior Geologist</h1>
+      <p>You recovered the rock stories, repaired the cycle machine
+      and explored your own journey.</p>
+      <p class="muted">This badge records completion.
+      Your facilitator will review your explanations and creative work.</p>
+    </div>
+    <div class="card">
+      <h2>Take your evidence with you.</h2>
+      <p>Download your mission record. Submit it, together with any separate
+      artwork, using your facilitator's usual method.</p>
+      <p>Your work is not sent automatically.</p>
+      <div class="row">
+        <button class="primary" onclick="downloadRecord()">Download mission record</button>
+        <button onclick="window.print()">Print / Save badge as PDF</button>
+      </div>
+    </div>`;
+}
+
+function downloadRecord() {
+  const journey=state.journey.map((rock,i)=>
+    (i ? " -- "+state.processes[i-1]+" --> " : "")+rock
+  ).join("");
+
+  const text=[
+    "VERVE COLLEGE | ROCK CYCLE RESCUE",
+    "Completed: "+new Date().toLocaleDateString(),
+    "",
+    "SPHERE INTERACTION",
+    state.sphereText,
+    "",
+    "MUSEUM EVIDENCE",
+    ...cases.map((item,i)=>
+      (i+1)+". "+item.question+"\n"+
+      item.options[item.answer]+"\n"+item.reason
+    ),
+    "",
+    "REPAIRED CYCLE",
+    events.join(" → "),
+    "Processes: "+processes.join(" → "),
+    "",
+    "MY ROCK JOURNEY",
+    journey,
+    "",
+    "WHY METAMORPHISM DOES NOT REQUIRE MELTING",
+    state.explanation,
+    "",
+    "MY EXHIBIT",
+    state.exhibit,
+    "",
+    "MY REFLECTION",
+    state.reflection,
+    "",
+    "Self-guided completion. Written work requires facilitator review."
+  ].join("\n");
+
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download="Rock_Cycle_Mission_Record.txt";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
+function restart() {
+  if (!confirm("Clear your progress and writing? Download your record first if you want to keep it.")) return;
+  state=fresh();
+  save();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
